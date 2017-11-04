@@ -1,0 +1,133 @@
+<div ng-controller="ActionCtrl">
+    <div class="bg-light lter b-b wrapper-md">
+        <h1 class="m-n font-thin h3"> 请求地址管理</h1>
+    </div>
+    <!-- toaster directive -->
+    <toaster-container toaster-options="{'position-class': 'toast-top-right', 'close-button':true}"></toaster-container>
+    <!-- / toaster directive -->
+    <div class="wrapper-md">
+      <alert type="info">进入此页面后会自动记录所有应用的请求，请求点击[刷新]按钮以展示最新数据。可双击编辑地址名称。</alert>
+      <div class="panel panel-default" ng-controller="ActionListCtrl">
+        <div class="panel-heading">实时请求获取</div>
+          <div class="row wrapper">
+              <div class="col-sm-5 m-b-xs">
+                  <button class="btn btn-sm btn-default" ng-click="refresh()">刷新</button>
+              </div>
+              <div class="col-sm-4">
+              </div>
+              <div class="col-sm-3">
+                  <div class="input-group">
+                      <input type="text" class="input-sm form-control" placeholder="页面查找" ng-model="requestActionSearch">
+              <span class="input-group-btn">
+                <button class="btn btn-sm btn-default" type="button" ng-click="pageSearch()">查找</button>
+              </span>
+                  </div>
+              </div>
+          </div>
+          <div class="table-responsive" ui-jq="slimScroll" ui-options="{height:'400px', size:'8px'}">
+              <table class="table table-striped b-t b-light" id="actionList">
+                  <thead>
+                  <tr>
+                      <th style="width:20px;">
+                          <label class="i-checks m-b-none">
+                              <input type="checkbox" ng-click="checkAll(this);"><i></i>
+                          </label>
+                      </th>
+                      <th>地址</th>
+                      <th style="width: 350px;">名称</th>
+                      <th>访问次数</th>
+                      <th style="width: 70px;">操作</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr ng-repeat="action in actions"  data-url="{{action.url}}">
+                      <td><label class="i-checks m-b-none"><input type="checkbox" name="urlCk" value="{{action.id}}"><i></i></label></td>
+                      <td>{{action.url}}</td>
+                      <td class="td-edit" data-name="text">{{action.text}}</td>
+                      <td>{{action.count}}</td>
+                      <td>
+                          <a modify href class="active" ng-click="modify(action.url,$event)" style="cursor: default;"><i class="fa fa-check text-success text-active"></i><i class="glyphicon glyphicon-open text-danger text" tooltip="提交修改"></i></a>
+                      </td>
+                  </tr>
+                  </tbody>
+              </table>
+          </div>
+          <footer class="panel-footer">
+              <div class="row">
+                  <div class="col-sm-4 hidden-xs">
+                  </div>
+                  <div class="col-sm-4 text-center">
+                      <small class="text-muted inline m-t-sm m-b-sm">showing 20-30 of 50 items</small>
+                  </div>
+                  <div class="col-sm-4 text-right text-center-xs">
+                      <ul class="pagination pagination-sm m-t-none m-b-none">
+                          <li><a href><i class="fa fa-chevron-left"></i></a></li>
+                          <li><a href>1</a></li>
+                          <li><a href>2</a></li>
+                          <li><a href>3</a></li>
+                          <li><a href>4</a></li>
+                          <li><a href>5</a></li>
+                          <li><a href><i class="fa fa-chevron-right"></i></a></li>
+                      </ul>
+                  </div>
+              </div>
+          </footer>
+      </div>
+        <div class="panel hbox hbox-auto-xs no-border" ng-controller="ActionConfCtrl">
+            <script type="text/ng-template" id="modal.html">
+                <div ng-include="'view/modal.html'"></div>
+            </script>
+            <div class="col wrapper">
+                <a ng-click="openConfContent()"><i class="fa fa-file-text-o text-info m-r-sm pull-right"></i></a>
+                <h4 class="font-thin m-t-none m-b-none text-primary-lt">配置文件</h4>
+                <span class="m-b block text-sm text-muted">获取时间：2016-05-06 11:11:01</span>
+                <div style="height:240px" ui-jq="slimScroll" ui-options="{height:'240px', size:'8px',railVisible: true}">
+                    <table class="table table-striped m-b-none">
+                        <thead>
+                        <tr>
+                            <th style="width:60px;" class="text-center">HEY</th>
+                            <th>请求地址</th>
+                            <th style="width: 250px;">请求名称</th>
+                            <th style="width: 100px;"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="proItem in proList" data-url="{{proItem.url}}">
+                            <td>
+                                <div ng-init="data1=[ 16,15,15,14,17,18,16,15,16 ]" ui-jq="sparkline" ui-options="[16,15,15,14,17,18,16,15,16], {type:'bar', height:19, barWidth:4, barSpacing:2, barColor:'#27c24c'}" class="sparkline inline"><canvas width="52" height="19" style="display: inline-block; width: 52px; height: 19px; vertical-align: top;"></canvas></div>
+                            </td>
+                            <td>{{proItem.url}}</td>
+                            <td class="td-edit" data-name="text">{{proItem.text}}</td>
+                            <td>
+                                <a modify href class="active m-r" ng-click="modify(proItem.url,$event)" style="cursor: default;"><i class="fa fa-check text-success text-active"></i><i class="glyphicon glyphicon-open text-danger text" tooltip="提交修改"></i></a>
+                                <a href="" class="" ng-click="modify(proItem.url,$event)"><i class="fa fa-times text-danger text" tooltip="删除"></i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col wrapper-lg w-lg bg-light dk r-r">
+                <h4 class="font-thin m-t-none m-b">Reports</h4>
+                <div class="">
+                    <div class="">
+                        <span class="pull-right text-primary">60%</span>
+                        <span>Consulting</span>
+                    </div>
+                    <progressbar value="60" class="progress-xs m-t-sm bg-white" animate="true" type="primary"></progressbar>
+                    <div class="">
+                        <span class="pull-right text-info">35%</span>
+                        <span>Online tutorials</span>
+                    </div>
+                    <progressbar value="35" class="progress-xs m-t-sm bg-white" animate="true" type="info"></progressbar>
+                    <div class="">
+                        <span class="pull-right text-warning">25%</span>
+                        <span>EDU management</span>
+                    </div>
+                    <progressbar value="25" class="progress-xs m-t-sm bg-white" animate="true" type="warning"></progressbar>
+                </div>
+                <p class="text-muted">Dales nisi nec adipiscing elit. Morbi id neque quam. Aliquam sollicitudin venenatis</p>
+            </div>
+        </div>
+    </div>
+</div>

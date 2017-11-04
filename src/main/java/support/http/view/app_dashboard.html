@@ -1,0 +1,258 @@
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-init="
+    app.settings.asideFolded = false; 
+    app.settings.asideDock = false;
+  ">
+  <!-- main -->
+  <div class="col">
+    <!-- main header -->
+    <div class="bg-light lter b-b wrapper-sm">
+      <div class="row">
+        <div class="col-sm-6 col-xs-12">
+          <h1 class="m-n font-thin h3 text-black">日志概况</h1>
+          <small class="text-muted">Log summary information</small>
+        </div>
+        <div class="col-sm-6 text-right hidden-xs">
+          <div class="inline m-r text-left">
+            <div class="m-b-xs">1290 <span class="text-muted">items</span></div>
+            <div ng-init="data1=[ 106,108,110,105,110,109,105,104,107,109,105,100,105,102,101,99,98 ]" 
+              ui-jq="sparkline" 
+              ui-options="{{data1}}, {type:'bar', height:20, barWidth:5, barSpacing:1, barColor:'#dce5ec'}" 
+              class="sparkline inline">loading...
+            </div>
+          </div>
+          <div class="inline text-left">
+            <div class="m-b-xs">$30,000 <span class="text-muted">revenue</span></div>
+            <div ng-init="data2=[ 105,102,106,107,105,104,101,99,98,109,105,100,108,110,105,110,109 ]" 
+              ui-jq="sparkline" 
+              ui-options="{{data2}}, {type:'bar', height:20, barWidth:5, barSpacing:1, barColor:'#dce5ec'}" 
+              class="sparkline inline">loading...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- / main header -->
+    <div class="wrapper-md" ng-controller="DashboardChartCtrl">
+        <!-- 筛选条件 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel wrapper">
+                    <h6 class="font-thin m-t-none m-b text-muted">筛选条件</h6>
+                    <form class="form-inline" role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" style="width: 240px;" ng-model="loginURL" placeholder="请输入系统登录的请求地址">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" ng-click="open($event)" class="form-control" datepicker-popup="yyyy-MM-dd" show-weeks="true" ng-model="logDate" show-button-bar="false" is-open="opened"  max-date="now" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="确定" close-on-date-selection="true" />
+                        </div>
+                        <button type="submit" class="btn btn-default" ng-click="loadBrowsers()">确定</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- /筛选条件 -->
+      <!-- 浏览器 -->
+        <div class="panel wrapper">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row row-sm">
+                        <div class="col-md-6 text-center b-r b-light no-border-xs">
+                            <div id="browserChart" style="height:300px" >
+                            </div>
+                            <div class="text-muted font-bold text-xs m-t m-b">使用浏览器情况统计</div>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <div id="platformChart" style="height:300px" >
+                            </div>
+                            <div class="text-muted font-bold text-xs m-t m-b">操作系统统计</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel wrapper">
+              <div class="table-responsive">
+                   <table id="browserTable" ui-jq="dataTable" ui-options="{
+                    sAjaxSource: 'api/queryLog.json?logVersion=eq_1&requestURI={{loginURL}}&startTime={{logDate|date: 'yyyy-MM-dd'}}&endTime={{logDate|date: 'yyyy-MM-dd'}}',
+                    sAjaxDataProp: 'object',
+                    bAutoWidth: false,
+                    bProcessing:true,
+                    sScrollX:'100%',
+                    bLengthChange: true,
+                    oLanguage: app.util.datatables.oLanguage,
+                      aoColumns: [
+                        {mData: 'logStartTimeF'  ,sWidth: 150 },
+                        {mData: 'requestURI'  ,sWidth: 350 },
+                        {mData: 'requestURIText'  ,sWidth: 200 },
+                        {mData: 'platform'  ,sWidth: 150 },
+                        {mData: 'explorerVer'  ,sWidth: 150 },
+                        {mData: 'executeTime'  ,sWidth: 150 },
+                        {mData: 'ip'  ,sWidth: 150 },
+                        {mData: 'parameters'  ,sWidth: 350 ,sClass:'text-ellipsis'},
+                        {mData: 'sessionid'  ,sWidth: 250}
+                      ]
+                    }" class="table table-striped m-b-none table-bordered table-hover" style="table-layout: fixed;  width: 2000px;">
+                      <thead>
+                      <tr>
+                          <th >请求时间</th>
+                          <th >请求地址</th>
+                          <th >请求名称</th>
+                          <th >操作系统</th>
+                          <th >浏览器</th>
+                          <th >执行时间(ms)</th>
+                          <th >IP</th>
+                          <th >请求参数</th>
+                          <th >SESSION编号</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <!--
+                      <tr role="row" class="odd"><td class="">2016-04-11 11:11:52.385</td><td class="ellipsis sorting_1">/reportMgr/logx/</td><td>win7</td><td class="">chrome/41</td><td>2</td><td>0:0:0:0:0:0:0:1</td><td></td><td>938CF35E2AF56A2BEAD39E2055C18179</td></tr>
+                      <tr role="row" class="even"><td class="">2016-04-11 11:01:45.849</td><td class="ellipsis sorting_1">/reportMgr/login</td><td>win7</td><td class="">chrome/41</td><td>29</td><td>127.0.0.1</td><td>username=admin`password=admin</td><td>938CF35E2AF56A2BEAD39E2055C18179</td></tr>
+                      <tr role="row" class="odd"><td class="">2016-04-11 15:24:52.427</td><td class="ellipsis sorting_1">/reportMgr/login</td><td>win7</td><td class="">chrome/41</td><td>188</td><td>0:0:0:0:0:0:0:1</td><td>username=admin`password=admin</td><td>AA5817D42CD54464973D910A4C7FE983</td></tr>
+                      <tr role="row" class="even"><td class="">2016-04-11 15:24:57.518</td><td class="ellipsis sorting_1">/reportMgr/login</td><td>win7</td><td class="">firefox/38</td><td>4</td><td>0:0:0:0:0:0:0:1</td><td>username=admin`password=admin</td><td>DBE80BD0B3F9F784C5DC6F618F19D9EB</td></tr>
+                      <tr role="row" class="odd"><td class="">2016-04-11 14:08:36.287</td><td class="ellipsis sorting_1">/reportMgr/login</td><td>win7</td><td class="">ie/11</td><td>63</td><td>0:0:0:0:0:0:0:1</td><td>username=admin`password=admin</td><td>FC031F7CCC14FCD5F4663F8443988FF7</td></tr>
+                      <tr role="row" class="even"><td class="">2016-04-11 15:26:01.654</td><td class="ellipsis sorting_1">/reportMgr/login</td><td>win7</td><td class="">ie/11</td><td>1</td><td>0:0:0:0:0:0:0:1</td><td>username=admin`password=admin</td><td>93F2995B215424583F1AEFC909F14C65</td></tr>
+                      <tr role="row" class="odd"><td class="">2016-04-11 15:28:11.046</td><td class="ellipsis sorting_1">/reportMgr/login</td><td>vista</td><td class="">ie/7</td><td>5</td><td>0:0:0:0:0:0:0:1</td><td>username=admin`password=admin</td><td>93F2995B215424583F1AEFC909F14C65</td></tr>
+                      <tr role="row" class="even"><td class="">2016-04-11 15:26:58.799</td><td class="ellipsis sorting_1">/reportMgr/login</td><td>iphone</td><td class="">Mozilla/5.0</td><td>2</td><td>0:0:0:0:0:0:0:1</td><td>username=admin`password=admin</td><td>AA5817D42CD54464973D910A4C7FE983</td></tr>
+                      <tr role="row" class="odd"><td class="">2016-04-11 14:09:31.673</td><td class="ellipsis sorting_1">/reportMgr/easyloan/developYearIndex</td><td>win7</td><td class="">ie/11</td><td>825</td><td>0:0:0:0:0:0:0:1</td><td></td><td>FC031F7CCC14FCD5F4663F8443988FF7</td></tr>
+                      <tr role="row" class="even"><td class="">2016-04-11 15:25:58.107</td><td class="ellipsis sorting_1">/reportMgr/easyloan/developYearIndex</td><td>win7</td><td class="">ie/11</td><td>1</td><td>0:0:0:0:0:0:0:1</td><td></td><td>93F2995B215424583F1AEFC909F14C65</td></tr>
+                        -->
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- / 浏览器 -->
+      <!-- SESSION链接 -->
+      <!-- / stats -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel wrapper">
+                    <h4 class="font-thin m-t-none m-b text-muted">连接情况</h4>
+                    <div id="sessionChart">
+                    </div>
+                </div>
+            </div>
+        </div>
+      <!-- service -->
+      <div class="panel hbox hbox-auto-xs no-border">
+        <div class="col wrapper">
+          <i class="fa fa-circle-o text-info m-r-sm pull-right"></i>
+          <h4 class="font-thin m-t-none m-b-none text-primary-lt">Managed Services</h4>
+          <span class="m-b block text-sm text-muted">Service report of this year (updated 1 hour ago)</span>
+          <div ui-jq="plot" ui-options="
+            [
+              { data: {{d4}}, lines: { show: true, lineWidth: 1, fill:true, fillColor: { colors: [{opacity: 0.2}, {opacity: 0.8}] } } }
+            ], 
+            {
+              colors: ['{{app.color.light}}'],
+              series: { shadowSize: 3 },
+              xaxis:{ show:false },
+              yaxis:{ font: { color: '#a1a7ac' } },
+              grid: { hoverable: true, clickable: true, borderWidth: 0, color: '#dce5ec' },
+              tooltip: true,
+              tooltipOpts: { content: '%s of %x.1 is %y.4',  defaultTheme: false, shifts: { x: 10, y: -25 } }
+            }
+          " style="height:240px" >
+          </div>
+        </div>
+        <div class="col wrapper-lg w-lg bg-light dk r-r">
+          <h4 class="font-thin m-t-none m-b">Reports</h4>
+          <div class="">
+            <div class="">
+              <span class="pull-right text-primary">60%</span>
+              <span>Consulting</span>
+            </div>
+            <progressbar value="60" class="progress-xs m-t-sm bg-white" animate="true" type="primary"></progressbar>
+            <div class="">
+              <span class="pull-right text-info">35%</span>
+              <span>Online tutorials</span>
+            </div>
+            <progressbar value="35" class="progress-xs m-t-sm bg-white" animate="true" type="info"></progressbar>
+            <div class="">
+              <span class="pull-right text-warning">25%</span>
+              <span>EDU management</span>
+            </div>
+            <progressbar value="25" class="progress-xs m-t-sm bg-white" animate="true" type="warning"></progressbar>
+          </div>
+          <p class="text-muted">Dales nisi nec adipiscing elit. Morbi id neque quam. Aliquam sollicitudin venenatis</p>
+        </div>
+      </div>
+      <!-- / service -->
+
+      <!-- tasks -->
+      <div class="panel wrapper">
+        <div class="row">
+          <div class="col-md-6 b-r b-light no-border-xs">
+            <a href class="text-muted pull-right text-lg"><i class="icon-arrow-right"></i></a>
+            <h4 class="font-thin m-t-none m-b-md text-muted">My Tasks</h4>
+            <div class=" m-b">
+              <div class="m-b">
+                <span class="label text-base bg-warning pos-rlt m-r"><i class="arrow right arrow-warning"></i> 19:30</span>
+                <a href>Feed cat</a>
+              </div>
+              <div class="m-b">
+                <span class="label text-base bg-info pos-rlt m-r"><i class="arrow right arrow-info"></i> 12:30</span>
+                <a href>Fishing Time</a>
+              </div>
+              <div class="m-b">
+                <span class="label text-base bg-primary pos-rlt m-r"><i class="arrow right arrow-primary"></i> 10:30</span>
+                <a href>Kick-off meeting</a>
+              </div>
+              <div class="m-b">
+                <span class="label text-base bg-light pos-rlt m-r"><i class="arrow right arrow-light"></i> 07:30</span>
+                <a href>Morning running</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">            
+            <div class="row row-sm">
+              <div class="col-xs-6 text-center">
+                <div ui-jq="easyPieChart" ui-options="{
+                    percent: 75,
+                    lineWidth: 4,
+                    trackColor: '{{app.color.light}}',
+                    barColor: '{{app.color.primary}}',
+                    scaleColor: false,
+                    size: 115,
+                    rotate: 90,
+                    lineCap: 'butt'
+                  }" class="inline m-t">
+                  <div>
+                    <span class="text-primary h4">75%</span>
+                  </div>
+                </div>
+                <div class="text-muted font-bold text-xs m-t m-b">Work Done</div>
+              </div>
+              <div class="col-xs-6 text-center">
+                <div ui-jq="easyPieChart" ui-options="{
+                    percent: 50,
+                    lineWidth: 4,
+                    trackColor: '{{app.color.light}}',
+                    barColor: '{{app.color.info}}',
+                    scaleColor: false,
+                    size: 115,
+                    rotate: 180,
+                    lineCap: 'butt'
+                  }" class="inline m-t">
+                  <div>
+                    <span class="text-info h4">50%</span>
+                  </div>
+                </div>
+                <div class="text-muted font-bold text-xs m-t m-b">Started</div>
+              </div>
+            </div>            
+          </div>
+        </div>
+      </div>
+      <!-- / tasks -->
+
+
+      <!-- / tasks -->
+    </div>
+  </div>
+  <!-- / main -->
