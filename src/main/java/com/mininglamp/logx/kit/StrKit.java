@@ -15,6 +15,8 @@
  */
 package com.mininglamp.logx.kit;
 
+import java.util.UUID;
+
 /**
  * StrKit.
  */
@@ -76,5 +78,8 @@ public class StrKit {
 			if (obj == null)
 				return false;
 		return true;
+	}
+	public static String getUUID(){
+		return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
 	}
 }

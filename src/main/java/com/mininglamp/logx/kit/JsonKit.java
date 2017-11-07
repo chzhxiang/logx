@@ -345,18 +345,22 @@ public class JsonKit {
 			json = json.substring(1,json.length()-1);
 			int jsonLen = json.length();
 			List<Map> list = new ArrayList<Map>();
-			int rankIdx = 0,preIdx = 0;
+			int rankIdx = 0,preIdx = 0,braceCount = 0;
 			while(rankIdx < jsonLen){
 				char rankChar = json.charAt(rankIdx);
+				if(rankChar == '{') braceCount++;
 				if(rankChar == '}'){
-					list.add((Map) parseValue(json.substring(preIdx,rankIdx+1)));
-					preIdx = rankIdx+1;
-					while(preIdx<jsonLen&&json.charAt(preIdx)!=','){
-						preIdx++;
-					}
-					if(preIdx < jsonLen){
-						preIdx++;
-					}
+					braceCount--;
+					if(braceCount == 0){
+						list.add((Map) parseValue(json.substring(preIdx,rankIdx+1)));
+						preIdx = rankIdx+1;
+						while(preIdx<jsonLen&&json.charAt(preIdx)!=','){
+							preIdx++;
+						}
+						if(preIdx < jsonLen){
+							preIdx++;
+						}
+					}					
 				}
 				rankIdx++;
 			}

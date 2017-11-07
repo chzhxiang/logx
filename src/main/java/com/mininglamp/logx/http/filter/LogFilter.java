@@ -68,7 +68,7 @@ public class LogFilter implements Filter{
 			//log before
 			LogManage.logStart(request);
 			//添加请求
-			RequestActionManage.addURL4All(request.getRequestURI());
+			RequestActionManage.addURL4All(target);
 		}
 		
 		try{

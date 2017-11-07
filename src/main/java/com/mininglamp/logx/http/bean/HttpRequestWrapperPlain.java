@@ -110,8 +110,7 @@ public class HttpRequestWrapperPlain implements HttpServletRequest {
 	}
 
 	public String getRequestedSessionId() {
-		
-		return null;
+		return httpSession.getId();
 	}
 
 	public String getServletPath() {

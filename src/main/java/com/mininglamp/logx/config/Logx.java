@@ -37,7 +37,6 @@ public class Logx {
 	 * reload the config file must more then the time.
 	 * default is five minutes.
 	 */
-	@SuppressWarnings("unused")
 	private static long RELOAD_INTERVAL = 1000 * 60 * 5; 
 	/**
 	 * Config prop
@@ -84,31 +83,40 @@ public class Logx {
 		}
 		return map;
 	}
-	
-//	public synchronized String getProperty(String key){
-//		if(logxMap.isEmpty()||logxMap.get("pro")==null) return null;
-//		
-//		Properties pro = (Properties) logxMap.get("pro");
-//		FileInputStream fis = null;
-//		try {
-//			long readtime = (Long) logxMap.get("readtime");
-//			if(System.currentTimeMillis() - readtime > RELOAD_INTERVAL){
-//				File file = new File((String) logxMap.get("filePath"));
-//				Long lastModified = file.lastModified();
-//				if (logxMap.get("lastModified") == null||logxMap.get("lastModified").equals(lastModified)) {
-//					pro.clear();
-//					fis = new FileInputStream(file);
-//					pro.load(fis);
-//					logxMap.put("lastModified", lastModified);
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}finally{
-//			CloseUtil.closeIO(fis);
-//		}
-//		return pro.getProperty(key);
-//	}
+	/**
+	 * Get config of <b>logx.properties</b>.<br/>
+	 * Lazy load config file by interval of RELOAD_INTERVAL.<br/>
+	 * The config file not modify frequently,so depreted the method.<br/>
+	 * czy<br/>
+	 * 2016年10月19日13:15:50
+	 * @param key
+	 * @return
+	 */
+	@Deprecated
+	public synchronized String getPropertyHot(String key){
+		if(logxMap.isEmpty()||logxMap.get("pro")==null) return null;
+		
+		Properties pro = (Properties) logxMap.get("pro");
+		FileInputStream fis = null;
+		try {
+			long readtime = (Long) logxMap.get("readtime");
+			if(System.currentTimeMillis() - readtime > RELOAD_INTERVAL){
+				File file = new File((String) logxMap.get("filePath"));
+				Long lastModified = file.lastModified();
+				if (logxMap.get("lastModified") == null||logxMap.get("lastModified").equals(lastModified)) {
+					pro.clear();
+					fis = new FileInputStream(file);
+					pro.load(fis);
+					logxMap.put("lastModified", lastModified);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			CloseUtil.closeIO(fis);
+		}
+		return pro.getProperty(key);
+	}
 	
 	public String getProperty(String key){
 		if(logxMap.isEmpty()||logxMap.get("pro")==null) return null;
