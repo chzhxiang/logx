@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="logx">
+    <output-path>$PROJECT_DIR$/out/artifacts/logx</output-path>
+    <root id="archive" name="logx.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="logx" />
+      <element id="directory" name="support">
+        <element id="dir-copy" path="$PROJECT_DIR$/src/main/java/support" />
+      </element>
+    </root>
+  </artifact>
+</component>
